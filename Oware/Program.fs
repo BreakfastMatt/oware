@@ -47,7 +47,7 @@ let gameState board =
    match x > (y + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
    |true -> "South wins"
    |false -> 
-        match x > (y + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
+        match y > (x + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
         |true -> "South wins"
         |false -> 
             match x = y && (a + b + c + d + e + f + a' + b' + c' + d' + e' + f') = 0  with 
