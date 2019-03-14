@@ -21,7 +21,9 @@ let start position =
     let s = (0,0) 
     {houses = h; scores = s; currentTurn = position}
     
-let score board = failwith "Not implemented c"
+let score board = 
+    let southScore,northScore = board.scores 
+    southScore,northScore
 
 let gameState board = failwith "Not implemented d"
 
