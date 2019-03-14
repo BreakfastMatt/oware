@@ -79,7 +79,21 @@ let nextPlayersTurn position =
     | South -> North //this means that South (player one) just had their turn and now it is North's (player two's) turn.
     | North -> South //this means that North (player two) just had their turn and now it is South's (player one's) turn
 
+let checkIfOwnHouse n position = 
+    //This function will be used in conjunction with a match to disallow the player to manipulate their opponent's houses
+    match position with
+    |South -> match n with 
+              |7|8|9|10|11|12 -> false
+              |_ -> true
+    |North -> match n with 
+              |1|2|3|4|5|6 -> false
+              |_ -> true
+
 let useHouse n board = 
+    //Player cannot manipulate their opponent's houses
+    match (checkIfOwnHouse n board.currentTurn) with
+    |false -> board
+    |_ ->
     match getSeeds n board with
     |0 -> board //return the board as is (ie the person did not select a valid house)
     |_ -> 
