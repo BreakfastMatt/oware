@@ -106,7 +106,21 @@ let nextPlayersTurn position =
     | South -> North //this means that South (player one) just had their turn and now it is North's (player two's) turn.
     | North -> South //this means that North (player two) just had their turn and now it is South's (player one's) turn
 
+let checkIfOwnHouse n position = 
+    //This function will be used in conjunction with a match to disallow the player to manipulate their opponent's houses
+    match position with
+    |South -> match n with 
+              |7|8|9|10|11|12 -> false
+              |_ -> true
+    |North -> match n with 
+              |1|2|3|4|5|6 -> false
+              |_ -> true
+
 let useHouse n board = 
+    //Player cannot manipulate their opponent's houses
+    match (checkIfOwnHouse n board.currentTurn) with
+    |false -> board
+    |_ ->
     match getSeeds n board with
     |0 -> board //return the board as is (ie the person did not select a valid house)
     |_ -> 
@@ -117,14 +131,16 @@ let useHouse n board =
     let updatedHouses = theChosenHouse n updatedHouses
 
     //Recursive function to distribute seeds from selected house to other houses
-    let rec distributeSeeds n count updatedHouses = //n = house to distribute to next, count = number of seeds remaining.
+    let rec distributeSeeds n count updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
         let n = match n with //To make a loop:  if n = 13, bind n to 1.  (therefore have a circular loop of 1-12)
                 | 13 -> 1 
                 | _ -> n
         match  count > 0 with
-        |true -> distributeSeeds (n+1) (count-1) (incrementHouseSeed n updatedHouses)  
+        |true -> match n = ogN with //To Skip the original house
+                 |false -> distributeSeeds (n+1) (count-1) (incrementHouseSeed n updatedHouses) ogN
+                 |_ -> distributeSeeds (n+1) count updatedHouses ogN
         |_ -> updatedHouses
-    let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses
+    let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
 
     //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
     let scoreboard = incrementScore board.currentTurn board
