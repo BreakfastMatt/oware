@@ -44,15 +44,16 @@ let score board =
 let gameState board = 
    let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
    let x,y = board.scores 
-   match x > (y + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
+   match x > 24 with 
    |true -> "South wins"
    |false -> 
-        match y > (x + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
+        match y > 24  with 
         |true -> "North wins"
         |false -> 
-            match x = y && (a + b + c + d + e + f + a' + b' + c' + d' + e' + f') = 0  with 
+            match x = 24 && y = 24 with 
             |true ->  "Game ended in a draw"
-            |false ->  match board.currentTurn with
+            |false ->  
+            match board.currentTurn with
                        |South -> "South's turn"
                        |North -> "North's turn"
    
