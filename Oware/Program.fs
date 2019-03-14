@@ -104,14 +104,16 @@ let useHouse n board =
     let updatedHouses = theChosenHouse n updatedHouses
 
     //Recursive function to distribute seeds from selected house to other houses
-    let rec distributeSeeds n count updatedHouses = //n = house to distribute to next, count = number of seeds remaining.
+    let rec distributeSeeds n count updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
         let n = match n with //To make a loop:  if n = 13, bind n to 1.  (therefore have a circular loop of 1-12)
                 | 13 -> 1 
                 | _ -> n
         match  count > 0 with
-        |true -> distributeSeeds (n+1) (count-1) (incrementHouseSeed n updatedHouses)  
+        |true -> match n = ogN with //To Skip the original house
+                 |false -> distributeSeeds (n+1) (count-1) (incrementHouseSeed n updatedHouses) ogN
+                 |_ -> distributeSeeds (n+1) count updatedHouses ogN
         |_ -> updatedHouses
-    let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses
+    let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
 
     //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
     let pl1 = {board.playerOne with houses = (a,b,c,d,e,f)} //score must change here too
