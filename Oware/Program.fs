@@ -32,7 +32,7 @@ let getSeeds n board =
     |10 -> d'
     |11 -> e'
     |12 -> f'
-    |_  -> failwith "Invalid choice of house"
+    |_  -> failwith "{getSeeds} Invalid choice of house"
 
 let theChosenHouse n (a,b,c,d,e,f,a',b',c',d',e',f') = function
     |1  -> (0,b,c,d,e,f,a',b',c',d',e',f') 
@@ -47,7 +47,7 @@ let theChosenHouse n (a,b,c,d,e,f,a',b',c',d',e',f') = function
     |10 -> (a,b,c,d,e,f,a',b',c',0,e',f') 
     |11 -> (a,b,c,d,e,f,a',b',c',d',0,f') 
     |12 -> (a,b,c,d,e,f,a',b',c',d',e',0) 
-    |_  -> failwith "Someone done did a fuck up"
+    |_  -> failwith "{theChosenHouse} Something went wrong, house was not in the range of 1 and 12 (inclusive)."
 
 let incrementHouseSeed n (a,b,c,d,e,f,a',b',c',d',e',f') = 
     let n = match n with
@@ -66,7 +66,7 @@ let incrementHouseSeed n (a,b,c,d,e,f,a',b',c',d',e',f') =
     |10 -> (a,b,c,d,e,f,a',b',c',d'+1,e',f')
     |11 -> (a,b,c,d,e,f,a',b',c',d',e'+1,f')
     |12 -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
-    |_ -> failwith "Sad cause bad"
+    |_ -> failwith "{incrementHouseSeed} There aren't any houses that do not lie within the range of 1 and 12 (inclusive)."
     
 let useHouse n board =
     let (a,b,c,d,e,f),(a',b',c',d',e',f') = board.playerOne.houses,board.playerTwo.houses 
