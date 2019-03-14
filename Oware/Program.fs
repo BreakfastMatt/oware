@@ -4,8 +4,16 @@ type StartingPosition =
     | South
     | North
 
-let getSeeds n  board = 
-    let board.Houses = (a,b,c,d,e,f,a',b',c',d',e',f')
+
+type Board = {
+    houses: int*int*int*int*int*int*int*int*int*int*int*int //(A,B,C,D,E,F,a,b,c,d,e,f) [cf charOf function]
+    scores: int*int //(South Score, North Score)
+    currentTurn: StartingPosition //South or North
+    }
+
+
+let getSeeds n board = 
+    let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
     match n with 
     |1 -> a
     |2 -> b
@@ -19,16 +27,18 @@ let getSeeds n  board =
     |10 -> d'
     |11 -> e'
     |12 -> f'
-    |_  -> -1
+    |_  -> failwith "Invalid choice of house"
 
+let useHouse n board = failwith "Not implemented b"
 
-let useHouse n board = failwith "Not implemented"
+let start position =    
+    let h = (4,4,4,4,4,4,4,4,4,4,4,4)
+    let s = (0,0) 
+    {houses = h; scores = s; currentTurn = position}
+    
+let score board = failwith "Not implemented c"
 
-let start position = failwith "Not implemented"
-
-let score board = failwith "Not implemented"
-
-let gameState board = failwith "Not implemented"
+let gameState board = failwith "Not implemented d"
 
 [<EntryPoint>]
 let main _ =
