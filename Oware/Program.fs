@@ -72,7 +72,34 @@ let incrementHouseSeed n (a,b,c,d,e,f,a',b',c',d',e',f') =
     |11 -> (a,b,c,d,e,f,a',b',c',d',e'+1,f')
     |12 -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
     |_ -> failwith "{incrementHouseSeed} There aren't any houses that do not lie within the range of 1 and 12 (inclusive)."
-    
+
+let incrementScore turn board= 
+
+  let rec countSeeds1 n board= 
+      match n with 
+      |13 -> board
+      |_ -> match getSeeds n board with
+            |2 -> countSeeds1 (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2 }}
+            |3 -> countSeeds1 (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3 }}
+            |_ -> countSeeds1 (n+1) board
+
+  let rec countSeeds2 n board= 
+      match n with 
+      |8 -> board
+      |_ -> match getSeeds n board with
+            |2 -> countSeeds2 (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2 }}
+            |3 -> countSeeds2 (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3 }}
+            |_ -> countSeeds2 (n+1) board
+
+  match turn with 
+  |South ->  countSeeds1 7 board 
+  |North ->  countSeeds2 1 board
+
+
+
+   
+
+  
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
     match position with
@@ -100,8 +127,11 @@ let useHouse n board =
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses
 
     //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
-    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f)} //score must change here too
-    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f')}//score must change here too 
+    let scoreboard = incrementScore board.currentTurn board
+    
+
+    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = scoreboard.playerOne.score} //score must change here too
+    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = scoreboard.playerTwo.score}//score must change here too 
     let turn = nextPlayersTurn board.currentTurn
     {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
