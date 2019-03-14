@@ -5,15 +5,20 @@ type StartingPosition =
     | North
 
 
+type Player = { //playerOne = South, playerTwo = North
+    houses: int*int*int*int*int*int
+    score: int
+}
+
 type Board = {
-    houses: int*int*int*int*int*int*int*int*int*int*int*int //(A,B,C,D,E,F,a,b,c,d,e,f) [cf charOf function]
-    scores: int*int //(South Score, North Score)
+    playerOne: Player //ReadyPlayerOne
+    playerTwo: Player
     currentTurn: StartingPosition //South or North
     }
 
 
 let getSeeds n board = 
-    let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
+    let (a,b,c,d,e,f),(a',b',c',d',e',f') = board.playerOne.houses, board.playerTwo.houses
     match n with 
     |1 -> a
     |2 -> b
@@ -31,19 +36,19 @@ let getSeeds n board =
 
 let useHouse n board = failwith "Not implemented b"
 
-let start position =    
-    let h = (4,4,4,4,4,4,4,4,4,4,4,4)
-    let s = (0,0) 
-    {houses = h; scores = s; currentTurn = position}
+let start position =
+    let h = (4,4,4,4,4,4)
+    let pl1 = {houses = h ; score = 0}
+    let pl2 = {houses = h ; score = 0}
+    {playerOne = pl1; playerTwo = pl2; currentTurn = position}
     
 let score board = 
-    let southScore,northScore = board.scores 
+    let southScore,northScore = board.playerOne.score , board.playerTwo.score 
     southScore,northScore
 
 
 let gameState board = 
-   let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
-   let x,y = board.scores 
+   let x,y = score board
    match x > 24 with 
    |true -> "South wins"
    |false -> 
@@ -53,10 +58,9 @@ let gameState board =
             match x = 24 && y = 24 with 
             |true ->  "Game ended in a draw"
             |false ->  
-            match board.currentTurn with
-                       |South -> "South's turn"
-                       |North -> "North's turn"
-   
+                match board.currentTurn with
+                |South -> "South's turn"
+                |North -> "North's turn"
   
 
 [<EntryPoint>]
