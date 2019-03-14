@@ -4,15 +4,26 @@ type StartingPosition =
     | South
     | North
 
-let getSeeds n board = failwith "Not implemented"
+type Board = {
+    houses: int*int*int*int*int*int*int*int*int*int*int*int //(A,B,C,D,E,F,a,b,c,d,e,f) [cf charOf function]
+    scores: int*int //(South Score, North Score)
+    currentTurn: StartingPosition //South or North
+    }
 
-let useHouse n board = failwith "Not implemented"
+let getSeeds n board:Board = 
+    let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
+    failwith "Not finished yet"
 
-let start position = failwith "Not implemented"
+let useHouse n board = failwith "Not implemented b"
 
-let score board = failwith "Not implemented"
+let start position =    
+    let h = (4,4,4,4,4,4,4,4,4,4,4,4)
+    let s = (0,0) 
+    {houses = h; scores = s; currentTurn = position}
+    
+let score board = failwith "Not implemented c"
 
-let gameState board = failwith "Not implemented"
+let gameState board = failwith "Not implemented d"
 
 [<EntryPoint>]
 let main _ =
