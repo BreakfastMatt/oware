@@ -4,32 +4,42 @@ type StartingPosition =
     | South
     | North
 
-let getSeeds n board = failwith "Not implemented"
+type Board = {
+    houses: int*int*int*int*int*int*int*int*int*int*int*int //(A,B,C,D,E,F,a,b,c,d,e,f) [cf charOf function]
+    scores: int*int //(South Score, North Score)
+    currentTurn: StartingPosition //South or North
+    }
 
-let useHouse n board = failwith "Not implemented"
+let getSeeds n board:Board = 
+    let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
+    failwith "Not finished yet"
 
-let start position = failwith "Not implemented"
+let useHouse n board = failwith "Not implemented b"
 
-let score board = failwith "Not implemented"
+let start position =    
+    let h = (4,4,4,4,4,4,4,4,4,4,4,4)
+    let s = (0,0) 
+    {houses = h; scores = s; currentTurn = position}
+    
+let score board = failwith "Not implemented c"
+
 
 let gameState board = 
-   let a,b,c,d,e,f,g,h,i,j,k,l = board.Houses
-   let x,y = board.Scores 
-   match x > (y + (a + b + c + d + e + f + g + h + i + j + k + l))  with 
+   let (a,b,c,d,e,f,a',b',c',d',e',f') = board.houses
+   let x,y = board.scores 
+   match x > (y + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
    |true -> "South wins"
    |false -> 
-        match x > (y + (a + b + c + d + e + f + g + h + i + j + k + l))  with 
+        match x > (y + (a + b + c + d + e + f + a' + b' + c' + d' + e' + f'))  with 
         |true -> "South wins"
         |false -> 
-   match board.CurrentTurn with
-   |South -> "South's turn"
-   |North -> "North's turn"
+            match x = y && (a + b + c + d + e + f + a' + b' + c' + d' + e' + f') = 0  with 
+            |true ->  "Game ended in a draw"
+            |false ->  match board.currentTurn with
+                       |South -> "South's turn"
+                       |North -> "North's turn"
    
-   (*match board with 
-   |(0,0,0,0,0,0,0,0,0,0,0,0),_,_,_ ->  "score board" 
-   |_,_,_,"South's turn" -> "North's turn"
-   |_,_,_, "North's turn" -> "South's turn"
-   //failwith "Not implemented"*)
+  
 
 [<EntryPoint>]
 let main _ =
