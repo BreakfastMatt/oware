@@ -50,15 +50,15 @@ let score board =
 let gameState board = 
    let x,y = score board
    match x > 24 with 
-   |true -> "South wins"
+   |true -> "South won"
    |false -> 
         match y > 24  with 
-        |true -> "North wins"
+        |true -> "North won"
         |false -> 
             match x = 24 && y = 24 with 
             |true ->  "Game ended in a draw"
             |false ->  
-                match board.currentTurn with
+                match board.currentTurn with  
                 |South -> "South's turn"
                 |North -> "North's turn"
   
