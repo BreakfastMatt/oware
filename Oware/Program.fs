@@ -39,7 +39,7 @@ let theChosenHouse n board =
     //Will take the chosen house and set its own seed count to zero, 
     //which indicates that the player has taken their turn and selected house n.
     let (a,b,c,d,e,f) = board.playerOne.houses
-    let (a',b',c',d',e',f') = board.playerOne.houses
+    let (a',b',c',d',e',f') = board.playerTwo.houses
     match n with
     |1  -> {board with playerOne = {board.playerOne with houses = (0,b,c,d,e,f)} }
     |2  -> {board with playerOne = {board.playerOne with houses = (a,0,c,d,e,f)} }
