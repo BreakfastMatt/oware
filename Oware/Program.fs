@@ -97,25 +97,17 @@ let gameState board =
 
 let incrementScore turn board= 
   
-  let rec countSeeds1 n board= 
+  let rec countSeeds x n board= 
       match n with 
-      |12-> board
+      |x -> board
       |_ -> match getSeeds n board with
-            |2 -> countSeeds1 (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2 }}
-            |3 -> countSeeds1 (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3 }}
-            |_ -> countSeeds1 (n+1) board
-
-  let rec countSeeds2 n board= 
-      match n with 
-      |6-> board
-      |_ -> match getSeeds n board with
-            |2 -> countSeeds2 (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2 }}
-            |3 -> countSeeds2 (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3 }}
-            |_ -> countSeeds2 (n+1) board
+            |2 -> countSeeds x (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2 }}
+            |3 -> countSeeds x (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3 }}
+            |_ -> countSeeds x (n+1) board
 
   match turn with 
-  |South ->  countSeeds1 7 board 
-  |North ->  countSeeds2 1 board
+  |South ->  countSeeds 12 7 board 
+  |North ->  countSeeds 7 1 board
   
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
