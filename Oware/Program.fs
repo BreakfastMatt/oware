@@ -74,6 +74,27 @@ let incrementHouseSeed n (a,b,c,d,e,f,a',b',c',d',e',f') =
     |12 -> (a,b,c,d,e,f,a',b',c',d',e',f'+1)
     |_ -> failwith "{incrementHouseSeed} There aren't any houses that do not lie within the range of 1 and 12 (inclusive)."
 
+let score board = 
+    //Merely returns a tuple containing the South Score and North Score.
+    let southScore,northScore = board.playerOne.score , board.playerTwo.score 
+    southScore,northScore  
+
+let gameState board = 
+    //Will return the games current state
+   let x,y = score board
+   match x > 24 with 
+   |true -> "South won"
+   |false -> 
+        match y > 24  with 
+        |true -> "North won"
+        |false -> 
+            match x = 24 && y = 24 with 
+            |true ->  "Game ended in a draw"
+            |false ->  
+                match board.currentTurn with  
+                |South -> "South's turn"
+                |North -> "North's turn"
+
 let incrementScore turn board= 
   
   let rec countSeeds1 n board= 
@@ -95,11 +116,6 @@ let incrementScore turn board=
   match turn with 
   |South ->  countSeeds1 7 board 
   |North ->  countSeeds2 1 board
-
-
-
-   
-
   
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
@@ -161,28 +177,7 @@ let start position =
     let pl2 = {houses = h ; score = 0}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position}
     
-let score board = 
-    //Merely returns a tuple containing the South Score and North Score.
-    let southScore,northScore = board.playerOne.score , board.playerTwo.score 
-    southScore,northScore
 
-
-let gameState board = 
-    //Will return the games current state
-   let x,y = score board
-   match x > 24 with 
-   |true -> "South won"
-   |false -> 
-        match y > 24  with 
-        |true -> "North won"
-        |false -> 
-            match x = 24 && y = 24 with 
-            |true ->  "Game ended in a draw"
-            |false ->  
-                match board.currentTurn with  
-                |South -> "South's turn"
-                |North -> "North's turn"
-  
 
 [<EntryPoint>]
 let main _ =
