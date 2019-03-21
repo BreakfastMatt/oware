@@ -100,18 +100,20 @@ let incrementScore turn board=
   let rec countSeedsS n board= 
       match n  with 
       |12 -> board
-      |_ -> match getSeeds n board with
-            |2 -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }}
-            |3 -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }}
-            |_ -> countSeedsS  (n+1) board
+      |_ -> match getSeeds n board, board.playerOne.score = 24 && board.playerTwo.score = 24  with
+            |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }}
+            |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }}
+            |_,false-> countSeedsS  (n+1) board
+            |_,_ -> board
 
   let rec countSeedsN n board= 
       match n  with 
       |7 -> board
-      |_ -> match getSeeds n board with
-            |2 -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }}
-            |3 -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }}
-            |_ -> countSeedsN  (n+1) board
+      |_ -> match getSeeds n board, board.playerTwo.score = 24 && board.playerOne.score >= 24 with
+            |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }}
+            |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }}
+            |_,false -> countSeedsN  (n+1) board
+            |_,_ -> board
 
   match turn with 
   |South ->  countSeedsS  7 board 
@@ -158,13 +160,18 @@ let useHouse n board =
                  |_ -> distributeSeeds (n+1) count updatedHouses ogN
         |_ -> updatedHouses
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
+    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score} 
+    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score}
+    let turn = nextPlayersTurn board.currentTurn
+    let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
     //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
     let scoreboard = incrementScore board.currentTurn board
+   // gameState board  <-- this has to be implemented somehow 
     
-    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = scoreboard.playerOne.score} //score must change here too
-    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = scoreboard.playerTwo.score}//score must change here too 
-    let turn = nextPlayersTurn board.currentTurn
+    let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score} //score must change here too
+    let pl2 = {board.playerTwo with houses = scoreboard.playerTwo.houses; score = scoreboard.playerTwo.score}//score must change here too 
+    //let turn = nextPlayersTurn board.currentTurn
     {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
 let start position = 
