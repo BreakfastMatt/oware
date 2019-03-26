@@ -108,11 +108,11 @@ let incrementScore lastHousePlaced turn board=
                         | 3,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
                                     {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}}
                         | _ -> board
-            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with //if it is north's turn, seeds should only be collected from south's side
+            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with //if it is south's turn, seeds should only be collected from north's side
                         | 2, true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
                                      {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
                         | 3, true ->let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
-                                    {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
+                                    {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 3}}
                         | _ -> board
     |false -> board    
   
@@ -197,8 +197,15 @@ let start position =
     let pl2 = {houses = h ; score = 0;numPieces = 24}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
+let playGame numbers =
+    let rec play xs game =
+        match xs with
+        | [] -> game
+        | x::xs -> play xs (useHouse x game)
+    play numbers (start South)
 
 [<EntryPoint>]
 let main _ =    
+    let game = playGame [1; 12; 5; 11; 2; 10; 3]
     printfn "Hello from F#!"
     0 // return an integer exit code
