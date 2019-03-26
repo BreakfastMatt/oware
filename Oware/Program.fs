@@ -102,8 +102,8 @@ let incrementScore turn board=
       match n  with 
       |12 -> board
       |_ -> match getSeeds n board, board.playerOne.score = 24 && board.playerTwo.score = 24  with
-            |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }}
-            |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }}
+            |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 2 }}
+            |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 3 }}
             |_,false-> countSeedsS  (n+1) board
             |_,_ -> board
 
@@ -111,13 +111,18 @@ let incrementScore turn board=
       match n  with 
       |7 -> board
       |_ -> match getSeeds n board, board.playerTwo.score = 24 && board.playerOne.score >= 24 with
-            |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }}
-            |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }}
+            |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 2 }}
+            |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 3 }}
             |_,false -> countSeedsN  (n+1) board
             |_,_ -> board
-  match turn with 
-  |South ->  countSeedsS  7 board 
-  |North ->  countSeedsN  1 board 
+
+  let x,y = score board // where x is south score and y is north score
+  match x > 24 || y > 24 || x =24 && y =24 with
+  |false ->match turn with 
+            |South ->  countSeedsS  7 board 
+            |North ->  countSeedsN  1 board 
+  |true -> board
+  
   
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
