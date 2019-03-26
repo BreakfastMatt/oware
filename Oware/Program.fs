@@ -8,6 +8,7 @@ type StartingPosition =
 type Player = { //playerOne = South, playerTwo = North
     houses: int*int*int*int*int*int
     score: int
+    numPieces: int //Determines how many pieces are currently on their board
 }
 
 type Board = {
@@ -96,13 +97,13 @@ let gameState board =
                 |North -> "North's turn"
 
 let incrementScore turn board= 
-  
+  //This function will capture seeds and adjust the score.
   let rec countSeedsS n board= 
       match n  with 
       |12 -> board
       |_ -> match getSeeds n board, board.playerOne.score = 24 && board.playerTwo.score = 24  with
-            |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }}
-            |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }}
+            |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 2 }}
+            |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 3 }}
             |_,false-> countSeedsS  (n+1) board
             |_,_ -> board
 
@@ -110,14 +111,18 @@ let incrementScore turn board=
       match n  with 
       |7 -> board
       |_ -> match getSeeds n board, board.playerTwo.score = 24 && board.playerOne.score >= 24 with
-            |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }}
-            |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }}
+            |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 2 }}
+            |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 3 }}
             |_,false -> countSeedsN  (n+1) board
             |_,_ -> board
 
-  match turn with 
-  |South ->  countSeedsS  7 board 
-  |North ->  countSeedsN  1 board 
+  let x,y = score board // where x is south score and y is north score
+  match x > 24 || y > 24 || x =24 && y =24 with
+  |false ->match turn with 
+            |South ->  countSeedsS  7 board 
+            |North ->  countSeedsN  1 board 
+  |true -> board
+  
   
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
@@ -144,16 +149,15 @@ let useHouse n board =
 
     //Player cannot manipulate their opponent's houses
     match (checkIfOwnHouse n board.currentTurn) with
-    |false -> board
+    |false -> board //this means it is not their own house and thus that turn did not count
     |_ ->
+    //Player cannot select an invalid house
     match getSeeds n board with
     |0 -> board //return the board as is (ie the person did not select a valid house)
     |_ -> 
     let (a,b,c,d,e,f),(a',b',c',d',e',f') = (theChosenHouse n board).playerOne.houses,(theChosenHouse n board).playerTwo.houses
     let updatedHouses = (a,b,c,d,e,f,a',b',c',d',e',f') 
     let numSeeds = getSeeds n board
-    //let updatedHouses = 
-
 
     //Recursive function to distribute seeds from selected house to other houses
     let rec distributeSeeds n remainingSeeds updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
@@ -169,28 +173,35 @@ let useHouse n board =
                  |false -> distributeSeeds (n+1) (remainingSeeds-1) (incrementHouseSeed n updatedHouses) ogN
                  |_ -> distributeSeeds (n+1) remainingSeeds updatedHouses ogN
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
-    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score} 
-    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score}
-    let turn = nextPlayersTurn board.currentTurn
-    let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
+    //Updates the board after seed distribution
+    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score; numPieces = (a+b+c+d+e+f)} 
+    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score; numPieces = (a'+b'+c'+d'+e'+f')}
+    let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = board.currentTurn}
 
-    //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
+    //To Update the scores
     let scoreboard = incrementScore board.currentTurn board
+
     //let scoreboard = scoreIncrementor lastHousePlaced board.currentTurn board
    // gameState board  <-- this has to be implemented somehow 
     
     let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score} //score must change here too
     let pl2 = {board.playerTwo with houses = scoreboard.playerTwo.houses; score = scoreboard.playerTwo.score}//score must change here too 
     //let turn = nextPlayersTurn board.currentTurn
+    //To alternate player turn
+    let turn = nextPlayersTurn board.currentTurn  
+
+    //Returns board with updated score and turn (i.e. changes that occurred after player x made their move)
+
     {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
 let start position = 
     //Initialises the board
     let h = (4,4,4,4,4,4)
     //All houses (South & North) must be initialised to have 4 seeds each.
-    let pl1 = {houses = h ; score = 0}
-    let pl2 = {houses = h ; score = 0}
-    {playerOne = pl1; playerTwo = pl2; currentTurn = position}
+
+    let pl1 = {houses = h ; score = 0; numPieces = 24}
+    let pl2 = {houses = h ; score = 0;numPieces = 24}
+    {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
 
 [<EntryPoint>]
