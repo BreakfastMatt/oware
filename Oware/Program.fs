@@ -136,6 +136,12 @@ let checkIfOwnHouse n position =
               |_ -> true
 
 let useHouse n board = 
+
+    let lastHousePlaced =  //finds the last house in which a seed is placed
+        match (getSeeds n board) + n >12 with
+        |true -> (getSeeds n board) + n + (-12)
+        |_ -> (getSeeds n board) + n
+
     //Player cannot manipulate their opponent's houses
     match (checkIfOwnHouse n board.currentTurn) with
     |false -> board
@@ -150,15 +156,18 @@ let useHouse n board =
 
 
     //Recursive function to distribute seeds from selected house to other houses
-    let rec distributeSeeds n count updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
+    let rec distributeSeeds n remainingSeeds updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
         let n = match n with //To make a loop:  if n = 13, bind n to 1.  (therefore have a circular loop of 1-12)
                 | 13 -> 1 
                 | _ -> n
-        match  count > 0 with
-        |true -> match n = ogN with //To Skip the original house
-                 |false -> distributeSeeds (n+1) (count-1) (incrementHouseSeed n updatedHouses) ogN
-                 |_ -> distributeSeeds (n+1) count updatedHouses ogN
-        |_ -> updatedHouses
+        match  remainingSeeds with
+        |0 -> updatedHouses
+        |1 -> match n = ogN with //To Skip the original house
+                 |false -> distributeSeeds (n+1) (remainingSeeds-1) (incrementHouseSeed n updatedHouses) ogN
+                 |_ -> distributeSeeds (n+1) remainingSeeds updatedHouses ogN
+        |_ -> match n = ogN with //To Skip the original house
+                 |false -> distributeSeeds (n+1) (remainingSeeds-1) (incrementHouseSeed n updatedHouses) ogN
+                 |_ -> distributeSeeds (n+1) remainingSeeds updatedHouses ogN
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
     let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score} 
     let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score}
@@ -167,6 +176,7 @@ let useHouse n board =
 
     //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
     let scoreboard = incrementScore board.currentTurn board
+    //let scoreboard = scoreIncrementor lastHousePlaced board.currentTurn board
    // gameState board  <-- this has to be implemented somehow 
     
     let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score} //score must change here too
@@ -181,10 +191,9 @@ let start position =
     let pl1 = {houses = h ; score = 0}
     let pl2 = {houses = h ; score = 0}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position}
-    
 
 
 [<EntryPoint>]
-let main _ =
+let main _ =    
     printfn "Hello from F#!"
     0 // return an integer exit code
