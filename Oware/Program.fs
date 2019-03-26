@@ -99,16 +99,16 @@ let gameState board =
 let incrementScore lastHousePlaced turn board= 
   //this function will capture seeds and adjust the score.
   let rec scoreAdder  lastHousePlaced board =
-    match lastHousePlaced<13 && lastHousePlaced>0 with
+    match lastHousePlaced<13 && lastHousePlaced>0 with //makes sure lastHouse is valid
     |true ->
         match turn=North with
-            |true -> match getSeeds lastHousePlaced board, lastHousePlaced<7 && lastHousePlaced>0 with
-                        | 2,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
-                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}}
+            |true -> match getSeeds lastHousePlaced board, lastHousePlaced<7 && lastHousePlaced>0 with //if it is north's turn, seeds should only be collected from south's side
+                        | 2,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board)) //updates board to remove collected seeds
+                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}} //adds to score
                         | 3,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
                                     {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}}
                         | _ -> board
-            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with
+            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with //if it is north's turn, seeds should only be collected from south's side
                         | 2, true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
                                      {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
                         | 3, true ->let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
@@ -116,33 +116,7 @@ let incrementScore lastHousePlaced turn board=
                         | _ -> board
     |false -> board    
   
-  scoreAdder lastHousePlaced board 
-
-  //let rec countSeedsS n board= 
-  //    match n  with 
-  //    |12 -> board
-  //    |_ -> match getSeeds n board, board.playerOne.score = 24 && board.playerTwo.score = 24  with
-  //          |2,false -> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 2; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 2 }}
-  //          |3,false-> countSeedsS  (n+1) {board with playerOne = {board.playerOne with score = board.playerOne.score + 3; houses = (theChosenHouse n board).playerOne.houses }; playerTwo = {board.playerTwo with numPieces = board.playerTwo.numPieces - 3 }}
-  //          |_,false-> countSeedsS  (n+1) board
-  //          |_,_ -> board
-
-  //let rec countSeedsN n board= 
-  //    match n  with 
-  //    |7 -> board
-  //    |_ -> match getSeeds n board, board.playerTwo.score = 24 && board.playerOne.score >= 24 with
-  //          |2,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 2; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 2 }}
-  //          |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }; playerOne = {board.playerOne with numPieces = board.playerOne.numPieces - 3 }}
-  //          |_,false -> countSeedsN  (n+1) board
-  //          |_,_ -> board
-
-  //let x,y = score board // where x is south score and y is north score
-  //match x > 24 || y > 24 || x =24 && y =24 with
-  //|false ->match turn with 
-  //          |South ->  countSeedsS  7 board 
-  //          |North ->  countSeedsN  1 board 
-  //|true -> board
-  
+  scoreAdder lastHousePlaced board   
   
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
