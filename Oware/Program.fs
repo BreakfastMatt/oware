@@ -98,22 +98,25 @@ let gameState board =
 
 let incrementScore lastHousePlaced turn board= 
   //this function will capture seeds and adjust the score.
-  let scoreAdder board = 
+  let rec scoreAdder  lastHousePlaced board =
+    match lastHousePlaced<13 && lastHousePlaced>0 with
+    |true ->
         match turn=North with
-            |true -> match getSeeds lastHousePlaced board with
-                        | 2 -> let newboard = (theChosenHouse lastHousePlaced board)
-                               {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}}
-                        | 3 -> let newboard = (theChosenHouse lastHousePlaced board)
-                               {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}}
+            |true -> match getSeeds lastHousePlaced board, lastHousePlaced<7 && lastHousePlaced>0 with
+                        | 2,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}}
+                        | 3,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}}
                         | _ -> board
-            |_  -> match getSeeds lastHousePlaced board with
-                        | 2 -> let newboard = (theChosenHouse lastHousePlaced board)
-                               {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
-                        | 3 ->let newboard = (theChosenHouse lastHousePlaced board)
-                              {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
+            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with
+                        | 2, true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                     {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
+                        | 3, true ->let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                    {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
                         | _ -> board
-
-  scoreAdder board 
+    |false -> board    
+  
+  scoreAdder lastHousePlaced board 
 
   //let rec countSeedsS n board= 
   //    match n  with 
