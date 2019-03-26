@@ -97,7 +97,7 @@ let gameState board =
                 |North -> "North's turn"
 
 let incrementScore turn board= 
-  
+  //This function will capture seeds and adjust the score.
   let rec countSeedsS n board= 
       match n  with 
       |12 -> board
@@ -138,7 +138,7 @@ let checkIfOwnHouse n position =
 let useHouse n board = 
     //Player cannot manipulate their opponent's houses
     match (checkIfOwnHouse n board.currentTurn) with
-    |false -> board
+    |false -> board //this means it is not their own house and thus that turn did not count
     |_ ->
     //Player cannot select an invalid house
     match getSeeds n board with
@@ -160,8 +160,8 @@ let useHouse n board =
         |_ -> updatedHouses
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
     //Updates the board after seed distribution
-    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score} 
-    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score}
+    let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score; numPieces = (a+b+c+d+e+f)} 
+    let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score; numPieces = (a'+b'+c'+d'+e'+f')}
     let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = board.currentTurn}
 
     //To Update the scores
