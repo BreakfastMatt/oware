@@ -8,6 +8,7 @@ type StartingPosition =
 type Player = { //playerOne = South, playerTwo = North
     houses: int*int*int*int*int*int
     score: int
+    numPieces: int //Determines how many pieces are currently on their board
 }
 
 type Board = {
@@ -177,8 +178,8 @@ let start position =
     //Initialises the board
     let h = (4,4,4,4,4,4)
     //All houses (South & North) must be initialised to have 4 seeds each.
-    let pl1 = {houses = h ; score = 0}
-    let pl2 = {houses = h ; score = 0}
+    let pl1 = {houses = h ; score = 0; numPieces = 24}
+    let pl2 = {houses = h ; score = 0;numPieces = 24}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
 [<EntryPoint>]
