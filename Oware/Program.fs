@@ -114,7 +114,6 @@ let incrementScore turn board=
             |3,false -> countSeedsN  (n+1) {board with playerTwo = {board.playerTwo with score = board.playerTwo.score + 3; houses = (theChosenHouse n board).playerTwo.houses }}
             |_,false -> countSeedsN  (n+1) board
             |_,_ -> board
-
   match turn with 
   |South ->  countSeedsS  7 board 
   |North ->  countSeedsN  1 board 
@@ -140,14 +139,13 @@ let useHouse n board =
     match (checkIfOwnHouse n board.currentTurn) with
     |false -> board
     |_ ->
+    //Player cannot select an invalid house
     match getSeeds n board with
     |0 -> board //return the board as is (ie the person did not select a valid house)
     |_ -> 
     let (a,b,c,d,e,f),(a',b',c',d',e',f') = (theChosenHouse n board).playerOne.houses,(theChosenHouse n board).playerTwo.houses
     let updatedHouses = (a,b,c,d,e,f,a',b',c',d',e',f') 
     let numSeeds = getSeeds n board
-    //let updatedHouses = 
-
 
     //Recursive function to distribute seeds from selected house to other houses
     let rec distributeSeeds n count updatedHouses ogN = //n = house to distribute to next, count = number of seeds remaining.
@@ -160,18 +158,19 @@ let useHouse n board =
                  |_ -> distributeSeeds (n+1) count updatedHouses ogN
         |_ -> updatedHouses
     let (a,b,c,d,e,f,a',b',c',d',e',f') =  distributeSeeds (n+1) numSeeds updatedHouses n
+    //Updates the board after seed distribution
     let pl1 = {board.playerOne with houses = (a,b,c,d,e,f); score = board.playerOne.score} 
     let pl2 = {board.playerTwo with houses = (a',b',c',d',e',f'); score = board.playerTwo.score}
-    let turn = nextPlayersTurn board.currentTurn
-    let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
+    let board = {board with playerOne = pl1; playerTwo = pl2; currentTurn = board.currentTurn}
 
-    //let newScores = //insert function here that returns a tuple, where tuple = (Updated South Score:int, Updated North Score:int)
+    //To Update the scores
     let scoreboard = incrementScore board.currentTurn board
-   // gameState board  <-- this has to be implemented somehow 
-    
-    let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score} //score must change here too
-    let pl2 = {board.playerTwo with houses = scoreboard.playerTwo.houses; score = scoreboard.playerTwo.score}//score must change here too 
-    //let turn = nextPlayersTurn board.currentTurn
+    let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score}
+    let pl2 = {board.playerTwo with houses = scoreboard.playerTwo.houses; score = scoreboard.playerTwo.score}
+    //To alternate player turn
+    let turn = nextPlayersTurn board.currentTurn  
+
+    //Returns board with updated score and turn (i.e. changes that occurred after player x made their move)
     {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
 let start position = 
@@ -180,9 +179,7 @@ let start position =
     //All houses (South & North) must be initialised to have 4 seeds each.
     let pl1 = {houses = h ; score = 0}
     let pl2 = {houses = h ; score = 0}
-    {playerOne = pl1; playerTwo = pl2; currentTurn = position}
-    
-
+    {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
 [<EntryPoint>]
 let main _ =
