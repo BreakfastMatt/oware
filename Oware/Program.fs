@@ -211,12 +211,16 @@ let printHouses board =
         |_ -> printSingle count board;(p (count + 1)) 
     p 1
 
+let printScores board = 
+    let ns = board.playerTwo.score |> string
+    let ss = board.playerOne.score |> string
+    printfn "North Score: %s\nSouth score: %s" ns ss
 
 let playGame board = 
     printfn "%s\n" (gameState board)
     let rec play board =
         printHouses board
-
+        printScores board
         printfn "Choose a house to play"
         let h = Console.ReadLine() |> string
         match gameState board with
