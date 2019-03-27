@@ -1,4 +1,6 @@
 ﻿module Oware
+open System
+open System
 
 type StartingPosition =
     | South
@@ -197,17 +199,9 @@ let start position =
     let pl2 = {houses = h ; score = 0;numPieces = 24}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
-let playGame numbers =
-    let rec play xs game =
-        match xs with
-        | [] -> game
-        | x::xs -> play xs (useHouse x game)
-    play numbers (start South)
-
 let printSingle n board = 
     let h = getSeeds n board
     printfn " House %i: %i" n h
-    
 
 let printHouses board = 
     let rec p count = 
@@ -217,7 +211,23 @@ let printHouses board =
         |_ -> printSingle count board;(p (count + 1)) 
     p 1
 
+
+let playGame board = 
+    printfn "%s\n" (gameState board)
+    let rec play board =
+        printHouses board
+
+        printfn "Choose a house to play"
+        let h = Console.ReadLine() |> string
+        match gameState board with
+        | "South's turn" | "North's turn" ->let h = (useHouse (h |> int) board)
+                                            play h 
+                                             
+        | _ -> useHouse 0
+    play (start South)
+
 [<EntryPoint>]
 let main _ =    
+    let hel = playGame (start South)
     printfn "Hello from F#!"
     0 // return an integer exit code
