@@ -138,8 +138,14 @@ let checkIfOwnHouse n position =
               |1|2|3|4|5|6 -> false
               |_ -> true
 
-let useHouse n board = 
+let returnNumPiecesOfOpponent board = 
+    let turn = board.currentTurn
+    match turn with 
+    |South -> board.playerTwo.numPieces //return numPieces that North has
+    |North -> board.playerOne.numPieces //return numPieces that South has
 
+let useHouse n board = 
+    let originalBoard = board
     let lastHousePlaced =  //finds the last house in which a seed is placed
         match (getSeeds n board) + n >12 with
         |true -> (getSeeds n board) + n + (-12)
@@ -183,8 +189,12 @@ let useHouse n board =
     //To alternate player turn
     let turn = nextPlayersTurn board.currentTurn  
 
-    //Returns board with updated score and turn (i.e. changes that occurred after player x made their move)
-    {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
+    //board with updated score
+    let updatedBoard = {board with playerOne = pl1; playerTwo = pl2}
+
+    match (returnNumPiecesOfOpponent board) with
+    |0 -> originalBoard
+    |_ -> {updatedBoard with currentTurn = turn}//board with updated  turn (i.e. changes that occurred after player x made their move)
 
 let start position = 
     //Initialises the board
