@@ -101,22 +101,24 @@ let gameState board =
 let incrementScore lastHousePlaced turn board= 
   //this function will capture seeds and adjust the score.
   let rec scoreAdder  lastHousePlaced board =
+    let pl1NumPieces = board.playerOne.numPieces
+    let pl2NumPieces = board.playerTwo.numPieces
     match lastHousePlaced<13 && lastHousePlaced>0 with //makes sure lastHouse is valid
     |true ->
         match turn=North with
-            |true -> match getSeeds lastHousePlaced board, lastHousePlaced<7 && lastHousePlaced>0 with //if it is north's turn, seeds should only be collected from south's side
-                        | 2,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board)) //updates board to remove collected seeds
-                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}} //adds to score
-                        | 3,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
-                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}}
-                        | _ -> board
-            |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6 with //if it is south's turn, seeds should only be collected from north's side
-                        | 2, true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
-                                     {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}}
-                        | 3, true ->let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
-                                    {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 3}}
-                        | _ -> board
-    |false -> board    
+        |true -> match getSeeds lastHousePlaced board, lastHousePlaced<7 && lastHousePlaced>0, (pl1NumPieces - 2 > 0 || (pl1NumPieces = 2 && pl2NumPieces = 0)), (pl1NumPieces - 3 > 0 || (pl1NumPieces = 3 && pl2NumPieces = 0)) with //if it is north's turn, seeds should only be collected from south's side
+                 | 2,true,true,_ -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board)) //updates board to remove collected seeds
+                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 2}; playerOne = {newboard.playerOne with numPieces = newboard.playerOne.numPieces - 2}}//adds to score
+                 | 3,true,_,true -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                    {newboard with playerTwo = {newboard.playerTwo with score = newboard.playerTwo.score + 3}; playerOne = {newboard.playerOne with numPieces = newboard.playerOne.numPieces - 3}}
+                 | _ -> board
+        |_  -> match getSeeds lastHousePlaced board, lastHousePlaced<13 && lastHousePlaced>6, (pl2NumPieces - 2 > 0 || (pl2NumPieces = 2 && pl1NumPieces = 0)), (pl2NumPieces - 3 > 0 || (pl2NumPieces = 3 && pl1NumPieces = 0)) with //if it is south's turn, seeds should only be collected from north's side
+               | 2, true,true,_ -> let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                   {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 2}; playerTwo = {newboard.playerTwo with numPieces = newboard.playerTwo.numPieces - 2}}
+               | 3, true,_,true ->let newboard = (scoreAdder (lastHousePlaced - 1) (theChosenHouse lastHousePlaced board))
+                                  {newboard with playerOne = {newboard.playerOne with score = newboard.playerOne.score + 3}; playerTwo = {newboard.playerTwo with numPieces = newboard.playerTwo.numPieces - 3}}
+               | _ -> board
+    |_ -> board    
   
   scoreAdder lastHousePlaced board   
   
