@@ -38,6 +38,7 @@ let getSeeds n board =
     |12 -> f'
     |_  -> failwith "{getSeeds} Invalid choice of house"
 
+//Used in the incrementScore and useHouse functions below
 let theChosenHouse n board = 
     //Will take the chosen house and set its own seed count to zero, 
     //which indicates that the player has taken their turn and selected house n.
@@ -58,6 +59,7 @@ let theChosenHouse n board =
     |12 -> {board with playerTwo = {board.playerTwo with houses = (a',b',c',d',e',0)} }
     |_  -> failwith "{theChosenHouse} Something went wrong, house was not in the range of 1 and 12 (inclusive)."
 
+//Used in the useHouse function below
 let incrementHouseSeed n (a,b,c,d,e,f,a',b',c',d',e',f') = 
     //This function will be used to increment the number of seeds in other houses.
     match n with 
@@ -98,6 +100,7 @@ let gameState board =
                 |South -> "South's turn"
                 |North -> "North's turn"
 
+//Used in the useHouse function below
 let incrementScore lastHousePlaced turn board= 
   //this function will capture seeds and adjust the score.
   let rec scoreAdder  lastHousePlaced board =
@@ -122,12 +125,14 @@ let incrementScore lastHousePlaced turn board=
   
   scoreAdder lastHousePlaced board   
   
+//Used in the useHouse function below
 let nextPlayersTurn position = 
     //Simple function that is used to alternate player turns.
     match position with
     | South -> North //this means that South (player one) just had their turn and now it is North's (player two's) turn.
     | North -> South //this means that North (player two) just had their turn and now it is South's (player one's) turn
 
+//Used in the useHouse function below
 let checkIfOwnHouse n position = 
     //This function will be used in conjunction with a match to disallow the player to manipulate their opponent's houses
     match position with
@@ -138,7 +143,9 @@ let checkIfOwnHouse n position =
               |1|2|3|4|5|6 -> false
               |_ -> true
 
+//Used in the useHouse function below
 let returnNumPiecesOfOpponent board = 
+    //Will return the number of pieces that the opponent currently has.
     let turn = board.currentTurn
     match turn with 
     |South -> board.playerTwo.numPieces //return numPieces that North has
@@ -192,8 +199,9 @@ let useHouse n board =
     //board with updated score
     let updatedBoard = {board with playerOne = pl1; playerTwo = pl2}
 
+    //Must play to give opponent pieces, if they have none.
     match (returnNumPiecesOfOpponent board) with
-    |0 -> originalBoard
+    |0 -> originalBoard //This is an exact copy of what the board looked like before the turn took place.
     |_ -> {updatedBoard with currentTurn = turn}//board with updated  turn (i.e. changes that occurred after player x made their move)
 
 let start position = 
@@ -205,11 +213,17 @@ let start position =
     let pl2 = {houses = h ; score = 0;numPieces = 24}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
+
+//used in the printHouses function below
 let returnSingle n board = 
+    //returns a string containing the house number and the number of seeds in it (e.g. House 1: 5)
     let h = getSeeds n board
     " House" + string n + ": " + string h
 
+
+ //Used in the playGame function below
 let printHouses board = 
+    //Output impure function
     let rec p count = 
         match count with
         |12 -> printfn " House %i: %i" count (getSeeds count board)
@@ -217,12 +231,15 @@ let printHouses board =
         |_ -> printfn "%s" (returnSingle count board);(p (count + 1)) 
     p 1
 
+//Used in the playGame function below
 let returnScores board = 
     let ns = board.playerTwo.score |> string
     let ss = board.playerOne.score |> string
     "South Score: " +  ss + "\nNorth score: " +  ns + "\n"
 
+//Allows you to actually play the game :D
 let playGame board = 
+    //Input impure function
     let rec play board =
         Console.Clear () //wipe it at start of each turn to make things look nicer
         let state =  (gameState board)
