@@ -204,8 +204,20 @@ let playGame numbers =
         | x::xs -> play xs (useHouse x game)
     play numbers (start South)
 
+let printSingle n board = 
+    let h = getSeeds n board
+    printfn " House %i: %i" n h
+    
+
+let printHouses board = 
+    let rec p count = 
+        match count with
+        |12 -> printfn " House %i: %i" count (getSeeds count board)
+        |13 -> ()
+        |_ -> printSingle count board;(p (count + 1)) 
+    p 1
+
 [<EntryPoint>]
 let main _ =    
-    let game = playGame [1; 12; 5; 11; 2; 10; 3]
     printfn "Hello from F#!"
     0 // return an integer exit code
