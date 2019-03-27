@@ -176,18 +176,12 @@ let useHouse n board =
 
     //To Update the scores
     let scoreboard = incrementScore lastHousePlaced board.currentTurn board
-
-    //let scoreboard = scoreIncrementor lastHousePlaced board.currentTurn board
-   // gameState board  <-- this has to be implemented somehow 
-    
     let pl1 = {board.playerOne with houses = scoreboard.playerOne.houses; score = scoreboard.playerOne.score} //score must change here too
     let pl2 = {board.playerTwo with houses = scoreboard.playerTwo.houses; score = scoreboard.playerTwo.score}//score must change here too 
-    //let turn = nextPlayersTurn board.currentTurn
     //To alternate player turn
     let turn = nextPlayersTurn board.currentTurn  
 
     //Returns board with updated score and turn (i.e. changes that occurred after player x made their move)
-
     {board with playerOne = pl1; playerTwo = pl2; currentTurn = turn}
 
 let start position = 
@@ -199,39 +193,41 @@ let start position =
     let pl2 = {houses = h ; score = 0;numPieces = 24}
     {playerOne = pl1; playerTwo = pl2; currentTurn = position} 
 
-let printSingle n board = 
+let returnSingle n board = 
     let h = getSeeds n board
-    printfn " House %i: %i" n h
+    " House" + string n + ": " + string h
 
 let printHouses board = 
     let rec p count = 
         match count with
         |12 -> printfn " House %i: %i" count (getSeeds count board)
         |13 -> ()
-        |_ -> printSingle count board;(p (count + 1)) 
+        |_ -> printfn "%s" (returnSingle count board);(p (count + 1)) 
     p 1
 
-let printScores board = 
+let returnScores board = 
     let ns = board.playerTwo.score |> string
     let ss = board.playerOne.score |> string
-    printfn "North Score: %s\nSouth score: %s" ns ss
+    "South Score: " +  ss + "\nNorth score: " +  ns + "\n"
 
 let playGame board = 
-    printfn "%s\n" (gameState board)
     let rec play board =
+        Console.Clear () //wipe it at start of each turn to make things look nicer
+        let state =  (gameState board)
+        match state with
+        | "North won" | "South won" | "Game ended in a draw" -> printfn "{%s}" state 
+        | _ -> 
+        printfn "%s" state
         printHouses board
-        printScores board
+        printfn "%s" (returnScores board)
+        
         printfn "Choose a house to play"
         let h = Console.ReadLine() |> string
-        match gameState board with
-        | "South's turn" | "North's turn" ->let h = (useHouse (h |> int) board)
-                                            play h 
-                                             
-        | _ -> useHouse 0
+        let h = (useHouse (h |> int) board)
+        play h                           
     play (start South)
 
 [<EntryPoint>]
 let main _ =    
     let hel = playGame (start South)
-    printfn "Hello from F#!"
     0 // return an integer exit code
