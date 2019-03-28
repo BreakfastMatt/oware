@@ -258,5 +258,6 @@ let playGame board =
 
 [<EntryPoint>]
 let main _ =    
+//Run the game using ctrl + f5
     let hel = playGame (start South)
     0 // return an integer exit code
